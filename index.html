@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>برای تو</title>
+    <!-- Persian Font: Vazirmatn — clean, modern, elegant -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================
+           CSS VARIABLES — Cinematic color palette
+           ========================================================== */
+        :root {
+            --bg-deep:       #060608;
+            --bg-dark:       #0b0b0f;
+            --gold:          #c9a96e;
+            --gold-light:    #e8d5b0;
+            --gold-dim:      #7a6843;
+            --text-primary:  #ede8e0;
+            --text-secondary:#9a9080;
+            --glass-bg:      rgba(255, 255, 255, 0.025);
+            --glass-border:  rgba(255, 255, 255, 0.07);
+        }
+
+        /* ==========================================================
+           RESET & BASE
+           ========================================================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Vazirmatn', 'Tahoma', 'Arial', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            direction: rtl;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            line-height: 1.8;
+        }
+
+        /* Selection color */
+        ::selection {
+            background: rgba(201, 169, 110, 0.25);
+            color: var(--text-primary);
+        }
+
+        /* ==========================================================
+           CINEMATIC VIGNETTE — Always-on dark edge overlay
+           ========================================================== */
+        .vignette {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at center, transparent 50%, var(--bg-deep) 100%);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* ==========================================================
+           PARTICLE CANVAS — Fixed background
+           ========================================================== */
+        #particles-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ==========================================================
+           SCENE 1: OPENING — Full-screen immersive intro
+           ========================================================== */
+        #opening {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            background: var(--bg-deep);
+            transition: opacity 1.8s cubic-bezier(0.4, 0, 0.2, 1),
+                        visibility 1.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #opening.fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Subtle radial ambient glow behind the poem */
+        #opening::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(201, 169, 110, 0.04) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: breathe 6s ease-in-out infinite;
+        }
+
+        .opening-poem {
+            font-size: clamp(1.05rem, 3vw, 1.5rem);
+            font-weight: 300;
+            color: var(--text-primary);
+            text-align: center;
+            max-width: 540px;
+            padding: 0 2rem;
+            line-height: 2.2;
+            opacity: 0;
+            animation: fadeInUp 2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
+            position: relative;
+            z-index: 2;
+        }
+
+        .opening-btn {
+            margin-top: 2.8rem;
+            background: transparent;
+            border: 1px solid var(--gold-dim);
+            color: var(--gold);
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 400;
+            padding: 0.85rem 2.4rem;
+            border-radius: 60px;
+            cursor: pointer;
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+            letter-spacing: 0.3px;
+            opacity: 0;
+            animation: fadeInUp 1.8s cubic-bezier(0.16, 1, 0.3, 1) 2.8s forwards;
+            transition: border-color 0.4s ease,
+                        box-shadow 0.4s ease,
+                        transform 0.3s ease;
+        }
+
+        .opening-btn:hover {
+            border-color: var(--gold);
+            box-shadow: 0 0 40px rgba(201, 169, 110, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .opening-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* Ripple fill on hover */
+        .opening-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 0; height: 0;
+            background: rgba(201, 169, 110, 0.06);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+        .opening-btn:hover::before {
+            width: 320px;
+            height: 320px;
+        }
+
+        /* Gentle glow pulse — starts after fade-in completes */
+        .opening-btn-glow {
+            animation: fadeInUp 1.8s cubic-bezier(0.16, 1, 0.3, 1) 2.8s forwards,
+                       btnPulse 3.5s ease-in-out 5s infinite;
+        }
+
+        /* ==========================================================
+           CONTENT WRAPPER — Revealed after opening
+           ========================================================== */
+        #content {
+            position: relative;
+            z-index: 50;
+            display: none;
+            opacity: 0;
+            transition: opacity 2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #content.visible {
+            opacity: 1;
+        }
+
+        /* ==========================================================
+           SHARED: SCENE (Full-viewport section)
+           ========================================================== */
+        .scene {
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 5rem 2rem;
+            position: relative;
+        }
+
+        /* ==========================================================
+           REVEAL ANIMATION — Elements that fade in on scroll
+           ========================================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ==========================================================
+           SCENE 2: STORY — Intimate monologue
+           ========================================================== */
+        .story-container {
+            max-width: 620px;
+            text-align: center;
+        }
+
+        .story-p {
+            font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+            font-weight: 300;
+            color: var(--text-secondary);
+            margin-bottom: 2.8rem;
+            line-height: 2.3;
+        }
+
+        .story-p.emphasis {
+            color: var(--text-primary);
+            font-weight: 400;
+        }
+
+        .story-p.placeholder-note {
+            border: 1px dashed rgba(201, 169, 110, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--gold-dim);
+        }
+
+        /* ---- Date Reveal: Characters appear from blur ---- */
+        .date-container {
+            text-align: center;
+            margin: 1.5rem 0 2rem;
+            position: relative;
+        }
+
+        .date-container::before,
+        .date-container::after {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 1px;
+            background: linear-gradient(to left, transparent, var(--gold-dim), transparent);
+            margin: 1.2rem auto;
+        }
+
+        .date-text {
+            font-size: clamp(1.6rem, 5vw, 2.4rem);
+            font-weight: 600;
+            color: var(--gold);
+            letter-spacing: 2px;
+            display: inline-block;
+        }
+
+        .date-text .char {
+            display: inline-block;
+            opacity: 0;
+            filter: blur(10px);
+            transform: translateY(8px);
+            transition: opacity 0.7s ease,
+                        filter 0.9s ease,
+                        transform 0.7s ease;
+        }
+
+        .date-text .char.show {
+            opacity: 1;
+            filter: blur(0);
+            transform: translateY(0);
+        }
+
+        /* Ornamental dots after story section */
+        .ornament {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin: 1rem 0 2rem;
+        }
+        .ornament span {
+            width: 4px; height: 4px;
+            border-radius: 50%;
+            background: var(--gold-dim);
+            opacity: 0.5;
+        }
+
+        /* ==========================================================
+           SCENE 3: MEMORY GALLERY — Glassmorphism cards
+           ========================================================== */
+        .gallery-heading {
+            font-size: clamp(1.1rem, 3vw, 1.35rem);
+            font-weight: 200;
+            color: var(--gold-dim);
+            margin-bottom: 0.6rem;
+        }
+
+        .gallery-line {
+            width: 40px;
+            height: 1px;
+            background: var(--gold-dim);
+            margin-bottom: 2.5rem;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.8rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .gallery-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                        box-shadow 0.5s ease;
+        }
+
+        .gallery-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 24px 80px rgba(201, 169, 110, 0.08),
+                        0 0 1px rgba(201, 169, 110, 0.15);
+        }
+
+        .gallery-img-placeholder {
+            width: 100%;
+            aspect-ratio: 4 / 5;
+            background: linear-gradient(160deg, #141418, #0e0e14);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle shimmer on the image placeholder */
+        .gallery-img-placeholder::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                120deg,
+                transparent 30%,
+                rgba(201, 169, 110, 0.03) 50%,
+                transparent 70%
+            );
+            background-size: 200% 100%;
+            animation: shimmerBg 4s ease-in-out infinite;
+        }
+
+        .gallery-img-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gallery-img-placeholder svg {
+            width: 40px;
+            height: 40px;
+            opacity: 0.2;
+            position: relative;
+            z-index: 1;
+        }
+
+        .gallery-caption {
+            padding: 1.1rem 1.4rem;
+            font-size: 0.85rem;
+            font-weight: 300;
+            color: var(--text-secondary);
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+            line-height: 1.8;
+        }
+
+        /* ==========================================================
+           SCENE 4: EMOTIONAL PEAK — Golden glow moment
+           ========================================================== */
+        #peak {
+            overflow: hidden;
+        }
+
+        .peak-glow {
+            position: absolute;
+            width: 450px;
+            height: 450px;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .peak-glow-1 {
+            background: radial-gradient(circle, rgba(201, 169, 110, 0.07) 0%, transparent 70%);
+            animation: glowPulse 5s ease-in-out infinite;
+        }
+
+        .peak-glow-2 {
+            background: radial-gradient(circle, rgba(232, 213, 176, 0.04) 0%, transparent 60%);
+            animation: glowPulse 7s ease-in-out 1.5s infinite;
+            width: 600px;
+            height: 600px;
+        }
+
+        .peak-sentence {
+            font-size: clamp(1.5rem, 5vw, 2.6rem);
+            font-weight: 300;
+            color: var(--text-primary);
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            line-height: 2;
+            max-width: 600px;
+        }
+
+        /* Scale-up reveal for peak */
+        .peak-sentence.reveal {
+            transform: translateY(20px) scale(0.96);
+        }
+        .peak-sentence.visible {
+            transform: translateY(0) scale(1);
+        }
+
+        /* ==========================================================
+           SCENE 5: FINAL MESSAGE — Closing with signature
+           ========================================================== */
+        .final-container {
+            text-align: center;
+            max-width: 580px;
+        }
+
+        .final-text {
+            font-size: clamp(1.05rem, 3vw, 1.3rem);
+            font-weight: 300;
+            color: var(--text-primary);
+            line-height: 2.6;
+            margin-bottom: 3rem;
+        }
+
+        .final-date {
+            font-weight: 500;
+            background: linear-gradient(
+                90deg,
+                var(--gold) 0%,
+                var(--gold-light) 45%,
+                var(--gold) 100%
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmerText 4s ease-in-out infinite;
+        }
+
+        .signature-line {
+            width: 50px;
+            height: 1px;
+            background: linear-gradient(to left, transparent, var(--gold-dim), transparent);
+            margin: 0 auto 1.5rem;
+        }
+
+        .signature {
+            font-size: 1.05rem;
+            font-weight: 200;
+            color: var(--gold-dim);
+            letter-spacing: 0.5px;
+        }
+
+        /* Bottom breathing room */
+        .spacer-bottom {
+            height: 12vh;
+        }
+
+        /* ==========================================================
+           KEYFRAME ANIMATIONS
+           ========================================================== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            50%      { transform: translate(-50%, -50%) scale(1.15); opacity: 0.6; }
+        }
+
+        @keyframes btnPulse {
+            0%, 100% { box-shadow: 0 0 0 rgba(201, 169, 110, 0); }
+            50%      { box-shadow: 0 0 30px rgba(201, 169, 110, 0.08); }
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            50%      { transform: translate(-50%, -50%) scale(1.25); opacity: 0.5; }
+        }
+
+        @keyframes shimmerBg {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        @keyframes shimmerText {
+            0%   { background-position: 200% center; }
+            100% { background-position: -200% center; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50%      { transform: translateY(-6px); }
+        }
+
+        /* ==========================================================
+           RESPONSIVE — Mobile-first adjustments
+           ========================================================== */
+        @media (max-width: 768px) {
+            .gallery-grid {
+                grid-template-columns: 1fr;
+                max-width: 320px;
+            }
+
+            .scene {
+                padding: 4rem 1.5rem;
+            }
+
+            .peak-glow {
+                width: 280px;
+                height: 280px;
+            }
+
+            .peak-glow-2 {
+                width: 380px;
+                height: 380px;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .gallery-grid {
+                grid-template-columns: repeat(3, 1fr);
+                max-width: 720px;
+            }
+        }
+
+        /* ==========================================================
+           ACCESSIBILITY: Reduced motion
+           ========================================================== */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ============================================================
+         CINEMATIC VIGNETTE OVERLAY
+         ============================================================ -->
+    <div class="vignette" aria-hidden="true"></div>
+
+    <!-- ============================================================
+         PARTICLE CANVAS — Ambient floating light motes
+         ============================================================ -->
+    <canvas id="particles-canvas" aria-hidden="true"></canvas>
+
+    <!-- ============================================================
+         SCENE 1: OPENING
+         A dark, quiet moment. A poetic line. An invitation to begin.
+         ============================================================ -->
+    <div id="opening">
+        <p class="opening-poem">
+            بعضی روزها، نقطهٔ آغازِ یک عمر می‌شوند...
+        </p>
+        <button class="opening-btn" id="startBtn" aria-label="شروع">
+            از اینجا شروع شد...
+        </button>
+    </div>
+
+    <!-- ============================================================
+         SCROLLABLE CONTENT — Revealed after opening
+         ============================================================ -->
+    <div id="content">
+
+        <!-- ========================================================
+             SCENE 2: STORY — Intimate Persian monologue
+             ======================================================== -->
+        <section class="scene" id="story">
+            <div class="story-container">
+
+                <p class="story-p reveal">
+                    نمی‌دانم دقیقاً از کجا شروع شد.<br>
+                    شاید از همان نگاه اول بود.<br>
+                    شاید از اولین لبخندی که دنیایم را زیر و رو کرد.
+                </p>
+
+                <!-- ======================== -->
+                <!--  PLACEHOLDER — Section 1 -->
+                <!--  ✏️ Replace the text below with your own personal story. -->
+                <!--  Describe the moment you first realized this was different. -->
+                <!-- ======================== -->
+                <p class="story-p placeholder-note reveal">
+                    ✏️ اینجا داستان شخصی خودت را بنویس —
+                    لحظه‌ای که برای اولین بار فهمیدی این احساس، متفاوت است...
+                </p>
+
+                <div class="ornament reveal">
+                    <span></span><span></span><span></span>
+                </div>
+
+                <p class="story-p emphasis reveal">
+                    فقط می‌دانم که یک روز،<br>
+                    تمام آنچه مدت‌ها در سینه‌ام سنگینی می‌کرد<br>
+                    را به زبان آوردم.
+                </p>
+
+                <!-- Animated Date Reveal — ۱۴۰۲/۰۷/۰۲ -->
+                <div class="date-container reveal" id="dateBlock">
+                    <span class="date-text" id="dateText" aria-label="تاریخ ۱۴۰۲/۰۷/۰۲">
+                        ۱۴۰۲/۰۷/۰۲
+                    </span>
+                </div>
+
+                <p class="story-p emphasis reveal">
+                    و از آن لحظه، آسمان من رنگ دیگری گرفت.
+                </p>
+
+                <!-- ======================== -->
+                <!--  PLACEHOLDER — Section 2 -->
+                <!--  ✏️ Replace the text below with more personal feelings. -->
+                <!--  What happened after? How did life change? -->
+                <!-- ======================== -->
+                <p class="story-p placeholder-note reveal">
+                    ✏️ اینجا متن دلخواه دیگری بنویس —
+                    احساست بعد از آن روز، خاطره‌ای خاص، یا هر چیزی که می‌خواهی بگویی...
+                </p>
+
+            </div>
+        </section>
+
+        <!-- ========================================================
+             SCENE 3: MEMORY GALLERY — Glassmorphism image cards
+             ======================================================== -->
+        <section class="scene" id="gallery">
+            <h2 class="gallery-heading reveal">لحظه‌هایی که فراموش نمی‌شوند</h2>
+            <div class="gallery-line reveal"></div>
+
+            <div class="gallery-grid">
+
+                <!-- CARD 1 -->
+                <!-- ✏️ To add a real image: replace the SVG inside gallery-img-placeholder
+                     with: <img src="your-image.jpg" alt="توضیح تصویر"> -->
+                <div class="gallery-card reveal">
+                    <div class="gallery-img-placeholder">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <path d="M21 15l-5-5L5 21"/>
+                        </svg>
+                    </div>
+                    <p class="gallery-caption">
+                        <!-- ✏️ PLACEHOLDER: Write your first memory caption -->
+                        [عنوان خاطره اول]
+                    </p>
+                </div>
+
+                <!-- CARD 2 -->
+                <div class="gallery-card reveal">
+                    <div class="gallery-img-placeholder">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <path d="M21 15l-5-5L5 21"/>
+                        </svg>
+                    </div>
+                    <p class="gallery-caption">
+                        <!-- ✏️ PLACEHOLDER: Write your second memory caption -->
+                        [عنوان خاطره دوم]
+                    </p>
+                </div>
+
+                <!-- CARD 3 -->
+                <div class="gallery-card reveal">
+                    <div class="gallery-img-placeholder">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <path d="M21 15l-5-5L5 21"/>
+                        </svg>
+                    </div>
+                    <p class="gallery-caption">
+                        <!-- ✏️ PLACEHOLDER: Write your third memory caption -->
+                        [عنوان خاطره سوم]
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========================================================
+             SCENE 4: EMOTIONAL PEAK — Golden atmospheric climax
+             ======================================================== -->
+        <section class="scene" id="peak">
+            <div class="peak-glow peak-glow-1" aria-hidden="true"></div>
+            <div class="peak-glow peak-glow-2" aria-hidden="true"></div>
+            <p class="peak-sentence reveal">
+                تو نفسِ روزهای منی
+            </p>
+        </section>
+
+        <!-- ========================================================
+             SCENE 5: FINAL MESSAGE — Closure with signature
+             ======================================================== -->
+        <section class="scene" id="final">
+            <div class="final-container">
+                <p class="final-text reveal">
+                    از همان روزی که <span class="final-date">۱۴۰۲/۰۷/۰۲</span> را ساختیم،
+                    <br>
+                    زندگی برای من شکل دیگری گرفت.
+                </p>
+                <div class="signature-line reveal"></div>
+                <p class="signature reveal">
+                    با عشق، علی
+                </p>
+            </div>
+        </section>
+
+        <!-- Bottom spacer for comfortable scrolling -->
+        <div class="spacer-bottom"></div>
+    </div>
+
+
+    <!-- ============================================================
+         JAVASCRIPT — Particles, Audio, Transitions, Scroll Reveals
+         ============================================================ -->
+    <script>
+        /* ==========================================================
+           1. PARTICLE SYSTEM — Warm, slow-drifting golden motes
+           ========================================================== */
+        (function initParticles() {
+            const canvas = document.getElementById('particles-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            const PARTICLE_COUNT = 55;
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            class Mote {
+                constructor() {
+                    this.spawn();
+                }
+                spawn() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.radius = Math.random() * 1.8 + 0.4;
+                    this.vx = (Math.random() - 0.5) * 0.2;
+                    this.vy = (Math.random() - 0.5) * 0.2;
+                    this.baseAlpha = Math.random() * 0.3 + 0.05;
+                    this.alpha = this.baseAlpha;
+                    this.phase = Math.random() * Math.PI * 2;
+                    this.phaseSpeed = 0.005 + Math.random() * 0.01;
+                    // Warm golden tones
+                    const warmth = Math.random();
+                    this.r = Math.floor(190 + warmth * 60);
+                    this.g = Math.floor(155 + warmth * 50);
+                    this.b = Math.floor(90 + warmth * 40);
+                }
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    this.phase += this.phaseSpeed;
+                    this.alpha = this.baseAlpha * (0.5 + 0.5 * Math.sin(this.phase));
+
+                    // Wrap around edges smoothly
+                    if (this.x < -10) this.x = canvas.width + 10;
+                    if (this.x > canvas.width + 10) this.x = -10;
+                    if (this.y < -10) this.y = canvas.height + 10;
+                    if (this.y > canvas.height + 10) this.y = -10;
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${this.r},${this.g},${this.b},${this.alpha})`;
+                    ctx.fill();
+                }
+            }
+
+            for (let i = 0; i < PARTICLE_COUNT; i++) {
+                particles.push(new Mote());
+            }
+
+            function loop() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (const p of particles) {
+                    p.update();
+                    p.draw();
+                }
+                requestAnimationFrame(loop);
+            }
+            loop();
+        })();
+
+
+        /* ==========================================================
+           2. AMBIENT SOUND — Warm sine-wave drone via Web Audio API
+              Starts only after user interaction (button click).
+           ========================================================== */
+        let ambientStarted = false;
+
+        function startAmbientSound() {
+            if (ambientStarted) return;
+            ambientStarted = true;
+
+            try {
+                const ac = new (window.AudioContext || window.webkitAudioContext)();
+
+                // Master gain — overall volume control
+                const master = ac.createGain();
+                master.gain.setValueAtTime(0, ac.currentTime);
+                master.gain.linearRampToValueAtTime(0.045, ac.currentTime + 4);
+
+                // Low-pass filter for warmth
+                const lpf = ac.createBiquadFilter();
+                lpf.type = 'lowpass';
+                lpf.frequency.value = 600;
+                lpf.Q.value = 0.7;
+                lpf.connect(master);
+                master.connect(ac.destination);
+
+                // Harmonic drone: soft major chord
+                const voices = [
+                    { freq: 130.81, gain: 0.35 },   // C3
+                    { freq: 164.81, gain: 0.22 },   // E3
+                    { freq: 196.00, gain: 0.18 },   // G3
+                    { freq: 261.63, gain: 0.10 },   // C4
+                ];
+
+                voices.forEach(v => {
+                    const osc = ac.createOscillator();
+                    const g = ac.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = v.freq;
+                    osc.detune.value = (Math.random() - 0.5) * 8;
+                    g.gain.value = v.gain;
+                    osc.connect(g);
+                    g.connect(lpf);
+                    osc.start();
+
+                    // Slow tremolo LFO
+                    const lfo = ac.createOscillator();
+                    const lfoG = ac.createGain();
+                    lfo.frequency.value = 0.06 + Math.random() * 0.08;
+                    lfoG.gain.value = v.gain * 0.25;
+                    lfo.connect(lfoG);
+                    lfoG.connect(g.gain);
+                    lfo.start();
+                });
+            } catch (e) {
+                // Audio not supported — silently continue
+                console.log('Web Audio not available');
+            }
+        }
+
+
+        /* ==========================================================
+           3. OPENING TRANSITION — Button click → cinematic fade
+           ========================================================== */
+        const startBtn = document.getElementById('startBtn');
+        const opening = document.getElementById('opening');
+        const content = document.getElementById('content');
+
+        // Add glow pulse class after initial fade-in animation completes
+        setTimeout(() => {
+            startBtn.classList.add('opening-btn-glow');
+        }, 4800);
+
+        startBtn.addEventListener('click', function () {
+            // Start ambient audio (requires user gesture)
+            startAmbientSound();
+
+            // Fade out opening scene
+            opening.classList.add('fade-out');
+
+            // After fade-out, remove opening & show content
+            setTimeout(() => {
+                opening.style.display = 'none';
+            }, 1900);
+
+            // Brief pause in darkness, then reveal content
+            setTimeout(() => {
+                content.style.display = 'block';
+                // Force browser reflow before adding class
+                void content.offsetHeight;
+                content.classList.add('visible');
+
+                // Initialize scroll-based reveals
+                setTimeout(initRevealObserver, 600);
+            }, 2200);
+        });
+
+
+        /* ==========================================================
+           4. SCROLL REVEAL — Intersection Observer for .reveal items
+              Each section's items are staggered independently.
+           ========================================================== */
+        function initRevealObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const el = entry.target;
+                        el.classList.add('visible');
+
+                        // If this element contains the date, trigger date animation
+                        if (el.id === 'dateBlock') {
+                            animateDateReveal();
+                        }
+
+                        observer.unobserve(el);
+                    }
+                });
+            }, {
+                threshold: 0.25,
+                rootMargin: '0px 0px -40px 0px'
+            });
+
+            // Group items per section and apply staggered delays
+            document.querySelectorAll('.scene').forEach(section => {
+                const items = section.querySelectorAll('.reveal');
+                items.forEach((el, i) => {
+                    el.style.transitionDelay = `${i * 0.18}s`;
+                    observer.observe(el);
+                });
+            });
+        }
+
+
+        /* ==========================================================
+           5. DATE REVEAL ANIMATION
+              Each character of ۱۴۰۲/۰۷/۰۲ appears from blur,
+              as if surfacing from a memory.
+           ========================================================== */
+        let dateAnimated = false;
+
+        function animateDateReveal() {
+            if (dateAnimated) return;
+            dateAnimated = true;
+
+            const dateEl = document.getElementById('dateText');
+            const original = dateEl.textContent.trim();
+            dateEl.textContent = '';
+
+            const chars = [...original];
+            chars.forEach((ch, i) => {
+                const span = document.createElement('span');
+                span.className = 'char';
+                span.textContent = ch;
+                dateEl.appendChild(span);
+
+                setTimeout(() => {
+                    span.classList.add('show');
+                }, 400 + i * 140);
+            });
+        }
+    </script>
+
+</body>
+</html>
